@@ -1,14 +1,28 @@
-import { Text, View, Dimensions, StyleSheet, TextInput } from 'react-native';
+import { Text, View, Dimensions, StyleSheet, TextInput, Pressable } from 'react-native';
 import styles from './styles';
 import Svg, { Image } from 'react-native-svg';
+import Animated, { useSharedValue, useAnimatedStyle, interpolate, withTiming } from 'react-native-reanimated';
 
 export default function App() {
   const { height, width } = Dimensions.get('window');
+  const imagePosition = useSharedValue(1);
+
+  const imageAnimatedStyle = useAnimatedStyle (() => {
+    const interpolation = interpolate(imagePosition.value, [0, 1], [-height /2,0]);
+    return {
+      transform: [{translateY: withTiming(interpolation, {duration: 1000})}]
+    }
+  });
+
+  const loginHandler = () => {
+    imagePosition.value = 0
+  }
+
   
   return (
     <View style={styles.container}>
-      <View style={StyleSheet.absoluteFill}>
-        <Svg height={height / 2} width={width}>
+      <Animated.View style={[ StyleSheet.absoluteFill, imageAnimatedStyle ]}>
+        <Svg height={height } width={width}>
           <Image 
             href={require('./assets/login-background.jpg')}
             width={width}
@@ -16,22 +30,28 @@ export default function App() {
             preserveAspectRatio='xMidYMid slice'
           />
         </Svg>
-      </View>
+        <View style={styles.closeButtonContainer}>
+          <Text>
+            Run
+          </Text>
+        </View>
+      </Animated.View>
 
       <View style={styles.buttomContainer}>
-       {/* <View style={styles.button}>
+        <Pressable style={styles.button}>
           <Text style={styles.buttonText}>
             LOG IN
           </Text>
-        </View>
+        </Pressable>
 
-          <View style={styles.button}>
+          <Pressable style={styles.button}>
             <Text style={styles.buttonText}>
               REGISTER
             </Text>
-  </View> */}
+          </Pressable> 
+          
       </View>
-        <View>
+       {/* <View style={ styles.formInputContainer}>
           <TextInput 
             placeholder='Email'
             placeholderTextColor={"black"}
@@ -52,7 +72,7 @@ export default function App() {
               <Text style={styles.buttonText}> LOG IN </Text>
 
             </View>
-        </View>
+</View> */}
     </View>
   );  
 }
